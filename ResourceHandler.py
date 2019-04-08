@@ -10,12 +10,33 @@ ResourceHandler.py
 """
 
 import array
+import os
 
 class ResourceHandler(object):
     """
     Utility class to handle multiple types of files (wav, images, text). 
     Provides method to read files as bytes and recreate them from those bytes array.
     """
+
+    @staticmethod
+    def get_destinations_filenames(filename_source):
+        """
+        Returns a tuple of strings. 
+        First element is the filename for the encrypted file.
+        Second element is the filename for the decrypted file.
+        """
+        filename_cipher_suffix = "_cipher"
+        filename_cipher = ".".join(filename_source.split(".")[:-1]) + \
+                            filename_cipher_suffix + \
+                            "." + \
+                            filename_source.split(".")[-1]
+
+        filename_decipher_suffix = "_decipher"
+        filename_decipher = ".".join(filename_source.split(".")[:-1]) + \
+                            filename_decipher_suffix + \
+                            "." + \
+                            filename_source.split(".")[-1]
+        return (filename_cipher, filename_decipher)
 
     @staticmethod
     def read_as_bytes(filename):
@@ -26,7 +47,7 @@ class ResourceHandler(object):
             bytes = array.array("B")
             bytes.frombytes(file.read())
             return bytes
-    
+
     @staticmethod
     def write_bytes_to_file(bytes, filename):
         """
@@ -36,4 +57,7 @@ class ResourceHandler(object):
             with open(filename, mode="bx") as file:
                 file.write(bytes)
         except FileExistsError:
-            print(filename, ": File already exists !")
+            os.remove(filename)
+            ResourceHandler.write_bytes_to_file(bytes, filename)
+        except Exception as e:
+            print(e)

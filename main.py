@@ -1,4 +1,5 @@
 from rc4 import encrypt, decrypt
+from rc5 import RC5
 from ResourceHandler import ResourceHandler
 
 import array
@@ -7,6 +8,9 @@ import array
 if __name__ == '__main__':
 
     key = 'Wddddddiki'
+
+    cryptor = RC5(key)
+    cryptor.mode = "CBC"
 
     FILENAME_SOURCE = "./resources/audio/hello_world.wav"
     # "./resources/images/goat.jpg"
@@ -17,32 +21,42 @@ if __name__ == '__main__':
     # "./resources/text/hello_world_rewritten.txt"
 
     # read source file
-    bytes = ResourceHandler.read_as_bytes(FILENAME_SOURCE)
+    music = ResourceHandler.read_as_bytes(FILENAME_SOURCE)
 
-    print(len(bytes))
+    print(bytes(music[:]))
+    enc_str = cryptor.encrypt(bytes(music[:50]))
+    print(enc_str)
+    dec_str = cryptor.decrypt(enc_str)
+    print(dec_str)
+    if dec_str == bytes(music[:50]):
+        print('\nGood')
+    else:
+        print('\nBad')
+
+
+    print(len(music))
 
     #print(bytes[0])
 
 
-    header = bytes[:45]
+    header = music[:127]
 
     print(header)
-    bytes = bytes[45:]
+    bytes = music[127:]
     cipher = encrypt(key, bytes)
 
     cipherFile = array.array("B", header.tolist() + cipher)
 
-    print(cipherFile[:45])
+    print(cipherFile[:127])
     # create destination file
     ResourceHandler.write_bytes_to_file(cipherFile, FILENAME_DESTINATION)
 
-    print(bytes[:10])
-    print(cipher[:10])
-
     decrypted = decrypt(key, cipher)
-    print(decrypted[:10])
+    decryptFile = array.array("B", header.tolist() + decrypted)
 
-    if bytes.tolist() == decrypted:
+    ResourceHandler.write_bytes_to_file(decryptFile, "./resources/audio/hello_world_decrypted.wav")
+
+    if music.tolist() == decrypted:
         print('\nGood')
     else:
         print('\nBad')

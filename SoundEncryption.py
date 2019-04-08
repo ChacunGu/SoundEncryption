@@ -10,6 +10,7 @@ SoundEncryption.py
 """
 
 import rc4
+from rc5 import RC5
 from ResourceHandler import ResourceHandler
 
 import array
@@ -22,7 +23,10 @@ def encrypt_data(key, data, algorithm="rc4"):
     """
     if algorithm == "rc4":
         return rc4.encrypt(key, data)
-    #elif algorithm == "rc5":
+    elif algorithm == "rc5":
+        cryptor = RC5(key)
+        cryptor.mode = "CBC"
+        return cryptor.encrypt(bytes(data))
 
 def decrypt_data(key, data, algorithm="rc4"):
     """
@@ -30,9 +34,12 @@ def decrypt_data(key, data, algorithm="rc4"):
     """
     if algorithm == "rc4":
         return rc4.decrypt(key, data)
-    #elif algorithm == "rc5":
+    elif algorithm == "rc5":
+        cryptor = RC5(key)
+        cryptor.mode = "CBC"
+        return cryptor.decrypt(bytes(data))
 
-def encrypt_decrypt_and_compare(filename, key, is_creating_wav_demo_file=False):
+def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_demo_file=False):
     """
     Opens file, encrypts it, saves its content, decrypts it and compares source file with final file.
     Uses Python's wave library if file is wav and the encrypted version should be listenable (used for preserving
@@ -50,7 +57,7 @@ def encrypt_decrypt_and_compare(filename, key, is_creating_wav_demo_file=False):
             data = audioop.reverse(frames, params.sampwidth)
 
             # encrypt
-            encrypted_data = encrypt_data(key, data, "rc4")
+            encrypted_data = encrypt_data(key, data, algorithm)
 
             # write encrypted file
             with wave.open(filename_cipher, "wb") as fd:
@@ -58,7 +65,7 @@ def encrypt_decrypt_and_compare(filename, key, is_creating_wav_demo_file=False):
                 fd.writeframes(bytes(encrypted_data))
 
             # decrypt
-            decrypted_data = decrypt_data(key, encrypted_data, "rc4")
+            decrypted_data = decrypt_data(key, encrypted_data, algorithm)
 
             # write decrypted file
             with wave.open(filename_decipher, "wb") as fd:
@@ -76,13 +83,13 @@ def encrypt_decrypt_and_compare(filename, key, is_creating_wav_demo_file=False):
         data = ResourceHandler.read_as_bytes(filename)
         
         # encrypt
-        encrypted_data = encrypt_data(key, data, "rc4")
+        encrypted_data = encrypt_data(key, data, algorithm)
 
         # write encrypted file
         ResourceHandler.write_bytes_to_file(array.array("B", encrypted_data), filename_cipher)
 
         # decrypt
-        decrypted_data = decrypt_data(key, encrypted_data, "rc4")
+        decrypted_data = decrypt_data(key, encrypted_data, algorithm)
 
         # write decrypted file
         ResourceHandler.write_bytes_to_file(array.array("B", decrypted_data), filename_decipher)
@@ -110,9 +117,13 @@ if __name__ == "__main__":
              "./resources/text/hello_world.txt"         # 5
             ]
 
+    FILENAME_SOURCE = FILES[1]
     KEY = "Wddddddiki"
-    FILENAME_SOURCE = FILES[0]
-    CREATE_WAV_DEMO_FILE = False
+    ALGORITHM = "rc5"
+    CREATE_WAV_DEMO_FILE = True
 
-    encrypt_decrypt_and_compare(FILENAME_SOURCE, KEY, is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
+    encrypt_decrypt_and_compare(FILENAME_SOURCE, 
+                                KEY, 
+                                ALGORITHM, 
+                                is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
         

@@ -1,7 +1,21 @@
+"""
+Security course
+Chacun Guillaume, Feuillade Julien
+HE-Arc, Neuchâtel
+2018-2019
+
+***
+
+rc5.py
+"""
 import os
+
 
 class RC5(object):
     def __init__(self, key):
+        """
+        Init value
+        """
         self.mode = 'CBC'  # "ECB" or "CBC"
         self.blocksize = 32
         self.rounds = 12
@@ -10,12 +24,18 @@ class RC5(object):
 
     @staticmethod
     def _rotate_left(val, r_bits, max_bits):
+        """
+        Rotate byte to the left
+        """
         v1 = (val << r_bits % max_bits) & (2 ** max_bits - 1)
         v2 = ((val & (2 ** max_bits - 1)) >> (max_bits - (r_bits % max_bits)))
         return v1 | v2
 
     @staticmethod
     def _rotate_right(val, r_bits, max_bits):
+        """
+        Rotate byte to the right
+        """
         v1 = ((val & (2 ** max_bits - 1)) >> r_bits % max_bits)
         v2 = (val << (max_bits - (r_bits % max_bits)) & (2 ** max_bits - 1))
 
@@ -23,6 +43,9 @@ class RC5(object):
 
     @staticmethod
     def _expand_key(key, wordsize, rounds):
+        """
+        Expand the key
+        """
         # Pads _key so that it is aligned with the word size, then splits it into words
         def _align_key(key, align_val):
             while len(key) % (align_val):
@@ -76,6 +99,9 @@ class RC5(object):
 
     @staticmethod
     def _encrypt_block(data, expanded_key, blocksize, rounds):
+        """
+        Prepare the encryption the current block with the expanded key
+        """
         w = blocksize // 2
         b = blocksize // 8
         mod = 2 ** w
@@ -95,6 +121,9 @@ class RC5(object):
 
     @staticmethod
     def _decrypt_block(data, expanded_key, blocksize, rounds):
+        """
+        Prepare the decryption the current block with the expanded key
+        """
         w = blocksize // 2
         b = blocksize // 8
         mod = 2 ** w
@@ -113,6 +142,9 @@ class RC5(object):
         return res
 
     def encrypt(self, data):
+        """
+        Encrypt the data in the block
+        """
         blocksize = self.blocksize
         key = self.key
         rounds = self.rounds
@@ -135,6 +167,9 @@ class RC5(object):
         return b"".join(out)
 
     def decrypt(self, data):
+        """
+        Decrypt the data in the block
+        """
         blocksize = self.blocksize
         key = self.key
         rounds = self.rounds
@@ -156,24 +191,3 @@ class RC5(object):
             index += b
             out.append(decrypted_chunk)
         return b"".join(out)
-
-#
-# if __name__ == '__main__':
-#
-#     text = b'\x13\0\0\0\x08'
-#     key = 'Wddddddiki'
-#
-#     # test encrypt string CBC mode
-#     cryptor = RC5(key)
-#     cryptor.mode = "CBC"
-#
-#     print('ori', text, len(text))
-#     enc_str = cryptor.encrypt(text)
-#     print("encrypted", enc_str, len(enc_str))
-#     dec_str = cryptor.decrypt(enc_str)
-#     print("decrypted", dec_str)
-#
-#     if dec_str == text:
-#         print('\nGood')
-#     else:
-#         print('\nBad')

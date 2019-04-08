@@ -1,3 +1,14 @@
+"""
+Security course
+Chacun Guillaume, Feuillade Julien
+HE-Arc, Neuchâtel
+2018-2019
+
+***
+
+rc4.py
+"""
+
 MOD = 256
 
 def KSA(key):

@@ -12,10 +12,12 @@ SoundEncryption.py
 import rc4
 from rc5 import RC5
 from ResourceHandler import ResourceHandler
+from RandomNumberGenerator import RandomNumberGenerator
 
 import array
 import wave
 import audioop
+import datetime
 
 def encrypt_data(key, data, algorithm="rc4"):
     """
@@ -117,13 +119,16 @@ if __name__ == "__main__":
              "./resources/text/hello_world.txt"         # 5
             ]
 
-    FILENAME_SOURCE = FILES[1]
+    FILENAME_SOURCE = FILES[2]
     KEY = "Wddddddiki"
     ALGORITHM = "rc5"
     CREATE_WAV_DEMO_FILE = True
 
-    encrypt_decrypt_and_compare(FILENAME_SOURCE, 
-                                KEY, 
-                                ALGORITHM, 
-                                is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
+    # encrypt_decrypt_and_compare(FILENAME_SOURCE, 
+    #                             KEY, 
+    #                             ALGORITHM, 
+    #                             is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
         
+    KEY_RDM = str(datetime.datetime.now())
+    rdm_generator = RandomNumberGenerator(KEY_RDM)
+    rdm_generator.display_random_image(1000)

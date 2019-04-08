@@ -67,12 +67,6 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
             # decrypt
             decrypted_data = decrypt_data(key, encrypted_data, algorithm)
 
-            a = array.array("B", data)
-            b = decrypted_data
-            print(len(a), a[-10:])
-            print(len(b), b[-10:])
-            compare_source_and_result(a,b)
-
             # write decrypted file
             with wave.open(filename_decipher, "wb") as fd:
                 fd.setparams(params)

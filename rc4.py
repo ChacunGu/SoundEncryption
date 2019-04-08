@@ -9,6 +9,8 @@ HE-Arc, Neuchâtel
 rc4.py
 """
 
+import array 
+
 MOD = 256
 
 def KSA(key):
@@ -70,4 +72,4 @@ def decrypt(key, cipher):
     Use codecs library to decode the cipher
     """
     result = logic(key, cipher)
-    return result
+    return array.array("B", result)

@@ -9,7 +9,7 @@ HE-Arc, Neuchâtel
 rc5.py
 """
 import os
-
+import array
 
 class RC5(object):
     def __init__(self, key):
@@ -145,6 +145,7 @@ class RC5(object):
         """
         Encrypt the data in the block
         """
+        data = bytes(data)
         blocksize = self.blocksize
         key = self.key
         rounds = self.rounds
@@ -164,12 +165,13 @@ class RC5(object):
 
             chunk = data[index: index + b]  # Read in blocksize number of bytes
             index += b
-        return b"".join(out)
+        return array.array("B", b"".join(out))
 
     def decrypt(self, data):
         """
         Decrypt the data in the block
         """
+        data = bytes(data)
         blocksize = self.blocksize
         key = self.key
         rounds = self.rounds
@@ -190,4 +192,4 @@ class RC5(object):
 
             index += b
             out.append(decrypted_chunk)
-        return b"".join(out)
+        return array.array("B", b"".join(out))

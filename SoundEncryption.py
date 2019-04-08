@@ -67,11 +67,17 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
             # decrypt
             decrypted_data = decrypt_data(key, encrypted_data, algorithm)
 
+            a = array.array("B", data)
+            b = decrypted_data
+            print(len(a), a[-10:])
+            print(len(b), b[-10:])
+            compare_source_and_result(a,b)
+
             # write decrypted file
             with wave.open(filename_decipher, "wb") as fd:
                 fd.setparams(params)
                 fd.writeframes(bytes(decrypted_data))
-                
+            
             # compare source and destination files
             compare_source_and_result(array.array("B", data), decrypted_data)
 
@@ -92,7 +98,7 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
         decrypted_data = decrypt_data(key, encrypted_data, algorithm)
 
         # write decrypted file
-        ResourceHandler.write_bytes_to_file(array.array("B", decrypted_data), filename_decipher)
+        ResourceHandler.write_bytes_to_file(decrypted_data, filename_decipher)
 
         # compare source and destination files
         compare_source_and_result(data, decrypted_data)
@@ -101,7 +107,7 @@ def compare_source_and_result(source, result):
     """
     Compares source and result files and prints result.
     """
-    if source.tolist() == result:
+    if source == result:
         print("Equal")
     else:
         print("Different") 

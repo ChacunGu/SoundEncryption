@@ -131,5 +131,6 @@ if __name__ == "__main__":
         
     KEY_RDM = str(datetime.datetime.now())
     rdm_generator = RandomNumberGenerator(KEY_RDM)
-    # rdm_generator.display_random_image(1000)
+    # rdm_generator.display_random_image()
     rdm_generator.verify_randomness()
+    rdm_generator.plot_random_and_semi_random()

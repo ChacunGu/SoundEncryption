@@ -55,8 +55,7 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
             # load data
             with wave.open(filename) as fd:
                 params = fd.getparams()
-                frames = fd.readframes(1000000) # 1 million frames max
-            data = audioop.reverse(frames, params.sampwidth)
+                data = fd.readframes(1000000) # 1 million frames max
 
             # encrypt
             encrypted_data = encrypt_data(key, data, algorithm)
@@ -110,27 +109,25 @@ def compare_source_and_result(source, result):
 
 
 if __name__ == "__main__":
-    FILES = ["./resources/audio/M1F1-Alaw-AFsp.wav",    # 0
-             "./resources/audio/bf1.wav",               # 1
-             "./resources/audio/organfinale.wav",       # 2
-             "./resources/audio/addf8-Alaw-GW.wav",     # 3
+    FILES = ["./resources/audio/nice-work.wav",         # 0
+             "./resources/audio/okay-1.wav",            # 1
 
-             "./resources/images/avengers.png",         # 4
-             "./resources/text/hello_world.txt"         # 5
+             "./resources/images/avengers.png",         # 2
+             "./resources/text/hello_world.txt"         # 3
             ]
 
-    FILENAME_SOURCE = FILES[2]
+    FILENAME_SOURCE = FILES[1]
     KEY = "Wddddddiki"
-    ALGORITHM = "rc5"
+    ALGORITHM = "rc4"
     CREATE_WAV_DEMO_FILE = True
 
-    # encrypt_decrypt_and_compare(FILENAME_SOURCE, 
-    #                             KEY, 
-    #                             ALGORITHM, 
-    #                             is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
+    encrypt_decrypt_and_compare(FILENAME_SOURCE, 
+                                KEY, 
+                                ALGORITHM, 
+                                is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
         
-    KEY_RDM = str(datetime.datetime.now())
-    rdm_generator = RandomNumberGenerator(KEY_RDM, use_custom=True)
-    rdm_generator.display_random_image()
-    rdm_generator.verify_randomness()
-    rdm_generator.plot_random_and_semi_random()
+    # KEY_RDM = str(datetime.datetime.now())
+    # rdm_generator = RandomNumberGenerator(KEY_RDM, use_custom=False)
+    # rdm_generator.display_random_image()
+    # rdm_generator.verify_randomness()
+    # rdm_generator.plot_random_and_semi_random()

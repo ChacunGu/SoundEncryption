@@ -18,9 +18,9 @@ import rc4
 
 class RandomNumberGenerator:
 
-    def __init__(self, key):
+    def __init__(self, key, use_custom=False):
         self.key = key = [ord(c) for c in key]
-        self.generator = rc4.KeyStream(self.key)
+        self.generator = rc4.KeyStream(self.key, use_custom)
 
     def generate(self):
         """

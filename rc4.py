@@ -40,13 +40,26 @@ def PRGA(tab):
         K = tab[(tab[i] + tab[j]) % MOD]
         yield K
 
+def PRGA_custom(tab):
+    """
+    Custom method used for keystream generation.
+    This method does NOT generate a pseudo random flux as it should be for RC4 to be secure. It is used
+    to demonstrate the importance of a random keystream in RC4.
+    """
+    i = 0
+    j = 0
+    while True:
+        i = (i + 1) % MOD
+        j = (j + tab[i]) % MOD
+        yield i+j
 
-def KeyStream(key):
+
+def KeyStream(key, use_custom=False):
     """
     Put the two function together to get the key stream
     """
-    keyKsa= KSA(key)
-    return PRGA(keyKsa)
+    keyKsa = KSA(key)
+    return PRGA_custom(keyKsa) if use_custom else PRGA(keyKsa)
 
 
 def logic(key, byteArray):

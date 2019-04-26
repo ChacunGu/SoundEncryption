@@ -130,7 +130,7 @@ if __name__ == "__main__":
     #                             is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
         
     KEY_RDM = str(datetime.datetime.now())
-    rdm_generator = RandomNumberGenerator(KEY_RDM)
-    # rdm_generator.display_random_image()
+    rdm_generator = RandomNumberGenerator(KEY_RDM, use_custom=True)
+    rdm_generator.display_random_image()
     rdm_generator.verify_randomness()
     rdm_generator.plot_random_and_semi_random()

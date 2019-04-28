@@ -159,6 +159,7 @@ class RC5(object):
         chunk = data[:index]
         out = []
         while chunk:
+            chunk = chunk.ljust(b, b'\x00')
             encrypted_chunk = RC5._encrypt_block(chunk, expanded_key, blocksize, rounds)
             out.append(encrypted_chunk)
 
@@ -186,6 +187,8 @@ class RC5(object):
         while chunk:
             decrypted_chunk = RC5._decrypt_block(chunk, expanded_key, blocksize, rounds)
             chunk = data[index: index + b]  # Read in blocksize number of bytes
+            if not chunk:
+                decrypted_chunk = decrypted_chunk.rstrip(b"\x00")
             index += b
             out.append(decrypted_chunk)
         return array.array("B", b"".join(out))

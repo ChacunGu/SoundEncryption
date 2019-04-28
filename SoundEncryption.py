@@ -15,9 +15,10 @@ from ResourceHandler import ResourceHandler
 from RandomNumberGenerator import RandomNumberGenerator
 
 import array
-import wave
 import audioop
 import datetime
+import sys
+import wave
 
 def encrypt_data(key, data, algorithm="rc4"):
     """
@@ -102,32 +103,130 @@ def compare_source_and_result(source, result):
     """
     Compares source and result files and prints result.
     """
+    print(source[-10:], len(source))
+    print(result[-10:], len(result))
     if source == result:
-        print("Equal")
+        print("Source and destination files are equal !")
     else:
-        print("Different") 
+        print("Source and destination files are different :(") 
 
+def standalone_encrypt(filename, key, algorithm="rc4"):
+    """
+    Opens file, encrypts it and saves its content.
+    """
+    filename_cipher = ResourceHandler.get_destinations_filenames(filename)[0]
+
+    # load data
+    data = ResourceHandler.read_as_bytes(filename)
+    
+    # encrypt
+    encrypted_data = encrypt_data(key, data, algorithm)
+
+    # write encrypted file
+    ResourceHandler.write_bytes_to_file(array.array("B", encrypted_data), filename_cipher)
+
+def standalone_decrypt(filename, key, algorithm="rc4"):
+    """
+    Opens file, decrypts it and saves its content.
+    """
+    filename_decipher = ResourceHandler.get_destinations_filenames(filename)[1]
+
+    # load data
+    data = ResourceHandler.read_as_bytes(filename)
+
+    # decrypt
+    decrypted_data = decrypt_data(key, data, algorithm)
+
+    # write decrypted file
+    ResourceHandler.write_bytes_to_file(decrypted_data, filename_decipher)
 
 if __name__ == "__main__":
-    FILES = ["./resources/audio/nice-work.wav",         # 0
-             "./resources/audio/okay-1.wav",            # 1
+    help_message = "Help - Available methods: " + \
+                   "\n  - Cipher or decipher specified file using specified algorithm & key." + \
+                   "\n    Syntax: python SoundEncryption.py [method_id: 1] [mode: cipher, decipher] filename [algorithm: rc4, rc5] key" + \
+                   "\n    Example: python SoundEncryption.py 1 cipher file.txt rc4 1234" + \
+                   "\n  - Generate a pseudo-random number with RC4 algorithm set with given key. Displays proof of randomness if parameter 'test_randomness' is set to True." + \
+                   "\n    Syntax: python SoundEncryption.py [method_id: 2] key [optional: test_randomness: True, False]" + \
+                   "\n    Example: python SoundEncryption.py 2 1234 True" + \
+                   "\n  - Cipher then deciphers and compare data to verify operations were successful. If processing a .WAV file parameter 'WAV_file_demo' allows to create a listenable version of the ciphered file." + \
+                   "\n    Syntax: python SoundEncryption.py [method_id: 3] filename [algorithm: rc4, rc5] key [optional: WAV_file_demo: True, False]" + \
+                   "\n    Example: python SoundEncryption.py 3 file.txt 1234 True"
 
-             "./resources/images/avengers.png",         # 2
-             "./resources/text/hello_world.txt"         # 3
-            ]
+    sys.argv.pop(0)
+    nb_args = len(sys.argv)
+    if nb_args <= 0:
+        print(help_message)
+        exit()
+    elif nb_args < 2:
+        print("Insufficient arguments. \n" + help_message)
+        exit()
+    elif nb_args > 5:
+        print("Too many arguments. \n" + help_message)
+        exit()
 
-    FILENAME_SOURCE = FILES[1]
-    KEY = "Wddddddiki"
-    ALGORITHM = "rc4"
-    CREATE_WAV_DEMO_FILE = True
+    # Methods:
+    # 5:     [method_id: 1] [mode: cipher, decipher] filename [algorithm: rc4, rc5] key
+    # 2-3:   [method_id: 2] key [optional: test_randomness: True, False]
+    # 4-5:   [method_id: 3] filename [algorithm: rc4, rc5] key [optional: WAV_file_demo: True, False]
 
-    encrypt_decrypt_and_compare(FILENAME_SOURCE, 
-                                KEY, 
-                                ALGORITHM, 
-                                is_creating_wav_demo_file=CREATE_WAV_DEMO_FILE)
-        
-    # KEY_RDM = str(datetime.datetime.now())
-    # rdm_generator = RandomNumberGenerator(KEY_RDM, use_custom=False)
-    # rdm_generator.display_random_image()
-    # rdm_generator.verify_randomness()
-    # rdm_generator.plot_random_and_semi_random()
+    if nb_args > 1:
+        method_id = sys.argv.pop(0)
+
+        if method_id == "1": # cipher or decipher
+            try:
+                mode = sys.argv[0] if sys.argv[0] == "cipher" or sys.argv[0] == "decipher" else None
+                filename = sys.argv[1]
+                algorithm = sys.argv[2] if sys.argv[2] == "rc4" or sys.argv[2] == "rc5" else None
+                key = sys.argv[3]
+
+                if mode is not None and algorithm is not None:
+                    if mode == "cipher":
+                        standalone_encrypt(
+                            filename, 
+                            key, 
+                            algorithm)
+                    else:
+                        standalone_decrypt(
+                            filename, 
+                            key, 
+                            algorithm)
+                else:
+                    print("Invalid parameters. \n" + help_message)
+            except Exception as e:
+                print(e)
+                print("Invalid parameters. \n" + help_message)
+
+        elif method_id == "2": # random number
+            key = sys.argv[0]
+            test_randomness = False
+            if nb_args == 3:
+                test_randomness = True if sys.argv[1] == "True" else False
+
+            rdm_generator = RandomNumberGenerator(key, use_custom=False)
+            print(f"Your random number: {rdm_generator.generate()}")
+            if test_randomness:
+                rdm_generator.display_random_image()
+                rdm_generator.verify_randomness()
+                rdm_generator.plot_random_and_semi_random()
+
+        elif method_id == "3": # full cipher/decipher pipeline            
+            filename = sys.argv[0]
+            algorithm = sys.argv[1] if sys.argv[1] == "rc4" or sys.argv[1] == "rc5" else None
+            key = sys.argv[2]
+
+            WAV_file_demo = False
+            if nb_args == 5:
+                WAV_file_demo = True if sys.argv[3] == "True" else False
+                if WAV_file_demo and not filename.split(".")[-1] == "wav":
+                    print("Parameter 'WAV_file_demo' is only for WAV files. Parameter ignored.")
+                    WAV_file_demo = False
+            
+            encrypt_decrypt_and_compare(
+                filename, 
+                key, 
+                algorithm,
+                is_creating_wav_demo_file=WAV_file_demo)
+        exit()
+
+    else: # invalid method id
+        print("Invalid method id. \n" + help_message)

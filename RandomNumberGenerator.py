@@ -24,15 +24,22 @@ class RandomNumberGenerator:
 
     def generate(self):
         """
-        Generates and returns a new random number.
+        Generates and returns a new random number between 0 and 1.
         """
-        return next(self.generator)
+        return next(self.generator) / 255
+
+    def generate_between_0_255(self):
+        """
+        Generates and returns a new random number between 0 and 255.
+        """
+        return self.generate() * 255
 
     def display_random_image(self, width=1000):
         """
         Displays a random image.
         """
-        img = [[self.generate() for j in range(width)] for i in range(width)]
+        img = [[self.generate_between_0_255() for j in range(width)] for i in range(width)]
+        plt.title("Image of 1000x1000 pseudo random numbers")
         plt.imshow(img)
         plt.show()
 
@@ -48,8 +55,8 @@ class RandomNumberGenerator:
         >>>
         Source: https://www.spss-tutorials.com/pearson-correlation-coefficient/
         """
-        raw_random = np.mean([pd.Series([self.generate() for i in range(nb_samples)]).autocorr() for i in range(nb_tests)])
-        random_with_sinus = np.mean([pd.Series([self.generate() + math.sin(i/sin_freq) * signal_amplitude
+        raw_random = np.mean([pd.Series([self.generate_between_0_255() for i in range(nb_samples)]).autocorr() for i in range(nb_tests)])
+        random_with_sinus = np.mean([pd.Series([self.generate_between_0_255() + math.sin(i/sin_freq) * signal_amplitude
                                                 for i in range(nb_samples)]).autocorr() for _ in range(nb_tests)])
         print("Autocorrelation for random signal: %0.5f" % raw_random)
         print("Autocorrelation for sinus added to random signal: %0.5f" % random_with_sinus)
@@ -61,7 +68,7 @@ class RandomNumberGenerator:
         x = np.linspace(0, nb_samples, nb_samples+1)
 
         # compute signals
-        raw_random = pd.Series([self.generate() for i in range(nb_samples)])
+        raw_random = pd.Series([self.generate_between_0_255() for i in range(nb_samples)])
         sinus = pd.Series([math.sin(i/sin_freq) * signal_amplitude for i in range(nb_samples)])
         random_with_sinus = pd.Series([rdm + sin for rdm, sin in zip(raw_random, sinus)])
         

@@ -43,10 +43,14 @@ class ResourceHandler(object):
         """
         Reads file and returns content as a bytes array.
         """
-        with open(filename, "rb") as file:
-            bytes = array.array("B")
-            bytes.frombytes(file.read())
-            return bytes
+        try:
+            with open(filename, "rb") as file:
+                bytes = array.array("B")
+                bytes.frombytes(file.read())
+                return bytes
+        except FileNotFoundError:
+            print(f"File not found: {filename}")
+            exit()
 
     @staticmethod
     def write_bytes_to_file(bytes, filename):

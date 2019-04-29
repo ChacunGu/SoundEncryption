@@ -190,7 +190,7 @@ if __name__ == "__main__":
                    "\n " + \
                    "\n  - Cipher then deciphers and compare data to verify operations were successful. If processing a .WAV file parameter 'WAV_file_demo' allows to create a listenable version of the ciphered file." + \
                    "\n    Syntax: python SoundEncryption.py [method_id: 3] filename [algorithm: rc4, rc5] key [optional: WAV_file_demo: True, False]" + \
-                   "\n    Example: python SoundEncryption.py 3 file.txt 1234 True"
+                   "\n    Example: python SoundEncryption.py 3 file.txt rc4 1234 True"
 
     sys.argv.pop(0)
     nb_args = len(sys.argv)

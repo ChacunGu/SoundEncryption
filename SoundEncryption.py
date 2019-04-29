@@ -7,6 +7,29 @@ HE-Arc, Neuchâtel
 ***
 
 SoundEncryption.py
+
+***
+
+How to use:
+Available methods:
+    - Cipher or decipher specified file using specified algorithm & key.
+      
+      Syntax: python SoundEncryption.py [method_id: 1] [mode: cipher, decipher] filename [algorithm: rc4, rc5] key
+      Example: python SoundEncryption.py 1 cipher file.txt rc4 1234
+    
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    - Generate a pseudo-random number with RC4 algorithm set with given key. Displays proof of randomness if parameter 'test_randomness' is set to True.
+      
+      Syntax: python SoundEncryption.py [method_id: 2] key [optional: test_randomness: True, False]
+      Example: python SoundEncryption.py 2 1234 True
+    
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    - Cipher then deciphers and compare data to verify operations were successful. If processing a .WAV file parameter 'WAV_file_demo' allows to create a listenable version of the ciphered file.
+      
+      Syntax: python SoundEncryption.py [method_id: 3] filename [algorithm: rc4, rc5] key [optional: WAV_file_demo: True, False]
+      Example: python SoundEncryption.py 3 file.txt 1234 True
 """
 
 import rc4
@@ -106,7 +129,6 @@ def compare_source_and_result(source, result):
     if source == result:
         print("Source and destination files are equal !")
     else:
-
         for offset in range(len(result)): # remove extra 0 added by the ciphers
             index = len(result) - 1 - offset
             if len(source) <= index and result[index] == 0:
@@ -116,8 +138,8 @@ def compare_source_and_result(source, result):
             print("Source and destination files are equal !")
         else:
             print("Source and destination files are different :(") 
-            print(source[-10:], len(source))
-            print(result[-10:], len(result))
+            print("Last 10 bytes of source file: ", source[-10:], len(source))
+            print("Last 10 bytes of destination file: ", result[-10:], len(result))
 
 def standalone_encrypt(filename, key, algorithm="rc4"):
     """
@@ -150,13 +172,16 @@ def standalone_decrypt(filename, key, algorithm="rc4"):
     ResourceHandler.write_bytes_to_file(decrypted_data, filename_decipher)
 
 if __name__ == "__main__":
-    help_message = "Help - Available methods: " + \
+    help_message = "\nSoundEncryption - Available methods: " + \
+                   "\n " + \
                    "\n  - Cipher or decipher specified file using specified algorithm & key." + \
                    "\n    Syntax: python SoundEncryption.py [method_id: 1] [mode: cipher, decipher] filename [algorithm: rc4, rc5] key" + \
                    "\n    Example: python SoundEncryption.py 1 cipher file.txt rc4 1234" + \
+                   "\n " + \
                    "\n  - Generate a pseudo-random number with RC4 algorithm set with given key. Displays proof of randomness if parameter 'test_randomness' is set to True." + \
                    "\n    Syntax: python SoundEncryption.py [method_id: 2] key [optional: test_randomness: True, False]" + \
                    "\n    Example: python SoundEncryption.py 2 1234 True" + \
+                   "\n " + \
                    "\n  - Cipher then deciphers and compare data to verify operations were successful. If processing a .WAV file parameter 'WAV_file_demo' allows to create a listenable version of the ciphered file." + \
                    "\n    Syntax: python SoundEncryption.py [method_id: 3] filename [algorithm: rc4, rc5] key [optional: WAV_file_demo: True, False]" + \
                    "\n    Example: python SoundEncryption.py 3 file.txt 1234 True"

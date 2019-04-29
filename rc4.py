@@ -62,12 +62,12 @@ def KeyStream(key, use_custom=False):
     return PRGA_custom(keyKsa) if use_custom else PRGA(keyKsa)
 
 
-def logic(key, byteArray):
+def logic(key, byteArray, use_custom=False):
     """
     Logic of the encryption, encryption key used for encrypting
     """
     key = [ord(c) for c in key]
-    keystream = KeyStream(key)
+    keystream = KeyStream(key, use_custom)
 
     result = []
     for c in byteArray:
@@ -76,13 +76,13 @@ def logic(key, byteArray):
     return result
 
 
-def encrypt(key, byteArray):
-    return logic(key, byteArray)
+def encrypt(key, byteArray, use_custom=False):
+    return logic(key, byteArray, use_custom)
 
 
-def decrypt(key, cipher):
+def decrypt(key, cipher, use_custom=False):
     """
     Use codecs library to decode the cipher
     """
-    result = logic(key, cipher)
+    result = logic(key, cipher, use_custom)
     return array.array("B", result)

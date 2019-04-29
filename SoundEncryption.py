@@ -43,29 +43,29 @@ import datetime
 import sys
 import wave
 
-def encrypt_data(key, data, algorithm="rc4"):
+def encrypt_data(key, data, algorithm="rc4", use_custom_rc4=False):
     """
     Encrypts data with key and specified algorithm.
     """
     if algorithm == "rc4":
-        return rc4.encrypt(key, data)
+        return rc4.encrypt(key, data, use_custom_rc4)
     elif algorithm == "rc5":
         cryptor = RC5(key)
         cryptor.mode = "CBC"
         return cryptor.encrypt(bytes(data))
 
-def decrypt_data(key, data, algorithm="rc4"):
+def decrypt_data(key, data, algorithm="rc4", use_custom_rc4=False):
     """
     Decrypts data with key and specified algorithm.
     """
     if algorithm == "rc4":
-        return rc4.decrypt(key, data)
+        return rc4.decrypt(key, data, use_custom_rc4)
     elif algorithm == "rc5":
         cryptor = RC5(key)
         cryptor.mode = "CBC"
         return cryptor.decrypt(bytes(data))
 
-def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_demo_file=False):
+def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_demo_file=False, use_custom_rc4=False):
     """
     Opens file, encrypts it, saves its content, decrypts it and compares source file with final file.
     Uses Python's wave library if file is wav and the encrypted version should be listenable (used for preserving
@@ -82,7 +82,7 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
                 data = fd.readframes(1000000) # 1 million frames max
 
             # encrypt
-            encrypted_data = encrypt_data(key, data, algorithm)
+            encrypted_data = encrypt_data(key, data, algorithm, use_custom_rc4)
 
             # write encrypted file
             with wave.open(filename_cipher, "wb") as fd:
@@ -90,7 +90,7 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
                 fd.writeframes(bytes(encrypted_data))
 
             # decrypt
-            decrypted_data = decrypt_data(key, encrypted_data, algorithm)
+            decrypted_data = decrypt_data(key, encrypted_data, algorithm, use_custom_rc4)
 
             # write decrypted file
             with wave.open(filename_decipher, "wb") as fd:
@@ -108,13 +108,13 @@ def encrypt_decrypt_and_compare(filename, key, algorithm="rc4", is_creating_wav_
         data = ResourceHandler.read_as_bytes(filename)
         
         # encrypt
-        encrypted_data = encrypt_data(key, data, algorithm)
+        encrypted_data = encrypt_data(key, data, algorithm, use_custom_rc4)
 
         # write encrypted file
         ResourceHandler.write_bytes_to_file(array.array("B", encrypted_data), filename_cipher)
 
         # decrypt
-        decrypted_data = decrypt_data(key, encrypted_data, algorithm)
+        decrypted_data = decrypt_data(key, encrypted_data, algorithm, use_custom_rc4)
 
         # write decrypted file
         ResourceHandler.write_bytes_to_file(decrypted_data, filename_decipher)
@@ -141,7 +141,7 @@ def compare_source_and_result(source, result):
             print("Last 10 bytes of source file: ", source[-10:], len(source))
             print("Last 10 bytes of destination file: ", result[-10:], len(result))
 
-def standalone_encrypt(filename, key, algorithm="rc4"):
+def standalone_encrypt(filename, key, algorithm="rc4", use_custom_rc4=False):
     """
     Opens file, encrypts it and saves its content.
     """
@@ -151,12 +151,14 @@ def standalone_encrypt(filename, key, algorithm="rc4"):
     data = ResourceHandler.read_as_bytes(filename)
     
     # encrypt
-    encrypted_data = encrypt_data(key, data, algorithm)
+    encrypted_data = encrypt_data(key, data, algorithm, use_custom_rc4)
 
     # write encrypted file
     ResourceHandler.write_bytes_to_file(array.array("B", encrypted_data), filename_cipher)
 
-def standalone_decrypt(filename, key, algorithm="rc4"):
+    print(f"Encrypted file saved in {filename_cipher}")
+
+def standalone_decrypt(filename, key, algorithm="rc4", use_custom_rc4=False):
     """
     Opens file, decrypts it and saves its content.
     """
@@ -166,12 +168,16 @@ def standalone_decrypt(filename, key, algorithm="rc4"):
     data = ResourceHandler.read_as_bytes(filename)
 
     # decrypt
-    decrypted_data = decrypt_data(key, data, algorithm)
+    decrypted_data = decrypt_data(key, data, algorithm, use_custom_rc4)
 
     # write decrypted file
     ResourceHandler.write_bytes_to_file(decrypted_data, filename_decipher)
 
+    print(f"Decrypted file saved in {filename_decipher}")
+
 if __name__ == "__main__":
+    USE_CUSTOM_RC4 = False
+
     help_message = "\nSoundEncryption - Available methods: " + \
                    "\n " + \
                    "\n  - Cipher or decipher specified file using specified algorithm & key." + \
@@ -218,12 +224,14 @@ if __name__ == "__main__":
                         standalone_encrypt(
                             filename, 
                             key, 
-                            algorithm)
+                            algorithm,
+                            use_custom_rc4=USE_CUSTOM_RC4)
                     else:
                         standalone_decrypt(
                             filename, 
                             key, 
-                            algorithm)
+                            algorithm,
+                            use_custom_rc4=USE_CUSTOM_RC4)
                 else:
                     print("Invalid parameters. \n" + help_message)
             except Exception as e:
@@ -236,7 +244,7 @@ if __name__ == "__main__":
             if nb_args == 3:
                 test_randomness = True if sys.argv[1] == "True" else False
 
-            rdm_generator = RandomNumberGenerator(key, use_custom=False)
+            rdm_generator = RandomNumberGenerator(key, use_custom=USE_CUSTOM_RC4)
             print(f"Your random number: {rdm_generator.generate()}")
             if test_randomness:
                 rdm_generator.display_random_image()
@@ -259,7 +267,8 @@ if __name__ == "__main__":
                 filename, 
                 key, 
                 algorithm,
-                is_creating_wav_demo_file=WAV_file_demo)
+                is_creating_wav_demo_file=WAV_file_demo,
+                use_custom_rc4=USE_CUSTOM_RC4)
         exit()
 
     else: # invalid method id

@@ -50,6 +50,9 @@ Cipher then deciphers and compare data to verify ciphering and deciphering opera
 ### Listenable ciphered WAV file restrictions
 For the 3rd method we are using Python's wave library to read WAV files header. However as of today it only supports specific subcategory of .WAV file format (WAVE_FORMAT_PCM: 0x0001). Don't worry if you are trying to read an unsuported .WAV file the application will tell you. Of course you can always set the flag "WAV_file_demo" to "False" and still observe that the output file is identic as the source.
 
+### Customized RC4
+If you want to try our customized RC4 method the flag USE_CUSTOM_RC4 in the main of the file SoundEncryption.py can be set to "True" (default value is "False").
+
 ## Team members
   * [Chacun Guillaume](https://github.com/ChacunGu)
   * [Feuillade Julien](https://github.com/Royejul)

@@ -1,3 +1,16 @@
+"""
+Security course
+Chacun Guillaume, Feuillade Julien
+HE-Arc, Neuchâtel
+2018-2019
+
+***
+
+rc4.py
+"""
+
+import array 
+
 MOD = 256
 
 def KSA(key):
@@ -27,21 +40,34 @@ def PRGA(tab):
         K = tab[(tab[i] + tab[j]) % MOD]
         yield K
 
+def PRGA_custom(tab):
+    """
+    Custom method used for keystream generation.
+    This method does NOT generate a pseudo random flux as it should be for RC4 to be secure. It is used
+    to demonstrate the importance of a random keystream in RC4.
+    """
+    i = 0
+    j = 0
+    while True:
+        i = (i + 1) % MOD
+        j = (j + tab[i]) % MOD
+        yield i+j
 
-def KeyStream(key):
+
+def KeyStream(key, use_custom=False):
     """
     Put the two function together to get the key stream
     """
-    keyKsa= KSA(key)
-    return PRGA(keyKsa)
+    keyKsa = KSA(key)
+    return PRGA_custom(keyKsa) if use_custom else PRGA(keyKsa)
 
 
-def logic(key, byteArray):
+def logic(key, byteArray, use_custom=False):
     """
     Logic of the encryption, encryption key used for encrypting
     """
     key = [ord(c) for c in key]
-    keystream = KeyStream(key)
+    keystream = KeyStream(key, use_custom)
 
     result = []
     for c in byteArray:
@@ -50,13 +76,13 @@ def logic(key, byteArray):
     return result
 
 
-def encrypt(key, byteArray):
-    return logic(key, byteArray)
+def encrypt(key, byteArray, use_custom=False):
+    return logic(key, byteArray, use_custom)
 
 
-def decrypt(key, cipher):
+def decrypt(key, cipher, use_custom=False):
     """
     Use codecs library to decode the cipher
     """
-    result = logic(key, cipher)
-    return result
+    result = logic(key, cipher, use_custom)
+    return array.array("B", result)

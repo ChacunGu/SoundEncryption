@@ -103,12 +103,21 @@ def compare_source_and_result(source, result):
     """
     Compares source and result files and prints result.
     """
-    print(source[-10:], len(source))
-    print(result[-10:], len(result))
     if source == result:
         print("Source and destination files are equal !")
     else:
-        print("Source and destination files are different :(") 
+
+        for offset in range(len(result)): # remove extra 0 added by the ciphers
+            index = len(result) - 1 - offset
+            if len(source) <= index and result[index] == 0:
+                source.append(0)
+
+        if source == result:
+            print("Source and destination files are equal !")
+        else:
+            print("Source and destination files are different :(") 
+            print(source[-10:], len(source))
+            print(result[-10:], len(result))
 
 def standalone_encrypt(filename, key, algorithm="rc4"):
     """
